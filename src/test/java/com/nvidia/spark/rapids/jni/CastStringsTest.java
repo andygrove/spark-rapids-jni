@@ -59,6 +59,28 @@ public class CastStringsTest {
   }
 
   @Test
+  void repro() {
+    // spark.range(1000000000L).selectExpr("CAST(id as STRING) as str_id").filter("regexp_like(str_id, '(.|\n)*1(.|\n)0(.|\n)*')").count()
+    int n = 100000000;
+//    int n = 1000000000;
+    long array[] = new long[n];
+    for (int i=0; i<n; i++) {
+      array[i] = i;
+    }
+
+    ColumnVector cv2 = null;
+    try (ColumnVector cv = ColumnVector.fromLongs(array)) {
+      cv2 = cv.castTo(DType.STRING);
+    }
+
+    try (ColumnVector matchesRe = cv2.matchesRe("(.|\\n)*1(.|\\n)0(.|\\n)*")) {
+      Table t = new Table(cv2);
+      Table t2 = t.filter(matchesRe);
+      System.out.println("count: " + t2.getRowCount()); // 5890599
+    }
+  }
+
+  @Test
   void castToIntegerAnsiTest() {
     Table.TestBuilder tb = new Table.TestBuilder();
     tb.column(3l, 9l, 4l, 2l, 20l);
