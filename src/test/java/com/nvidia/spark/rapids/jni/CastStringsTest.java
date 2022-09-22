@@ -31,6 +31,20 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class CastStringsTest {
+
+  @Test
+  void castLongToString() {
+    int n = 1_000_000_000;
+    long array[] = new long[n];
+    for (int i = 0; i < n; i++) {
+      array[i] = i;
+    }
+    try (ColumnVector cv = ColumnVector.fromLongs(array);
+      ColumnVector cv2 = cv.castTo(DType.STRING)) {
+      // success
+    }
+}
+
   @Test
   void castToIntegerTest() {
     Table.TestBuilder tb = new Table.TestBuilder();
