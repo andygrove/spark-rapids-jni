@@ -25,59 +25,58 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class RegexTest {
 
-//
-//  @Test
-//  void regexStabilityTest1() throws InterruptedException {
-//    doStabilityTest(1_000_000_000, 2, new long [] { 0, 0 }, 1);
-//  }
-//
-//  void doStabilityTest(int n, int numThreads, long expectedValues[], int maxAttempt) throws InterruptedException {
-//    // This test aims to reproduce the following Spark query, which produces inconsistent results between runs
-//    // spark.range(1000000000L).selectExpr("CAST(id as STRING) as str_id").filter("regexp_like(str_id, '(.|\n)*1(.|\n)0(.|\n)*')").count()
-//
-//    // no need to create initial input in parallel
-//    ColumnVector inputs[] = new ColumnVector[numThreads];
-//    int chunk_size = n/numThreads;
-//    for (int j = 0; j<numThreads; j++) {
-//      long array[] = new long[chunk_size];
-//      for (int i = 0; i < chunk_size; i++) {
-//        array[i] = chunk_size * j + i;
-//      }
-//      try (ColumnVector cv = ColumnVector.fromLongs(array)) {
-//        inputs[j] = cv.castTo(DType.STRING);
-//      }
-//    }
-//
-//    for (int attempt = 0; attempt< maxAttempt; attempt++) {
-//      System.err.println("attempt " + attempt + " of " + maxAttempt);
-//
-//      Thread threads[] = new Thread[numThreads];
-//      long result[] = new long[numThreads];
-//      for (int j = 0; j < numThreads; j++) {
-//        int threadNo = j;
-//        threads[j] = new Thread(() -> {
-//          try (ColumnVector matchesRe = inputs[threadNo].matchesRe("(.|\\n)*1(.|\\n)0(.|\\n)*");
-//               Table t = new Table(inputs[threadNo]);
-//               Table t2 = t.filter(matchesRe)) {
-//            result[threadNo] = t2.getRowCount();
-//            System.err.println("thread " + threadNo + " count: " + t2.getRowCount());
-//          }
-//
-//        });
-//        System.err.println("starting thread");
-//        threads[j].start();
-//      }
-//
-//      for (Thread t : threads) {
-//        System.err.println("waiting for thread");
-//        t.join();
-//        System.err.println("thread completed");
-//      }
-//
-//      for (int j = 0; j < numThreads; j++) {
-//        assertEquals(expectedValues[j], result[j]);
-//      }
-//    }
-//  }
+  @Test
+  void regexStabilityTest1() throws InterruptedException {
+    doStabilityTest(500_000_000, 2, new long [] { 0, 0 }, 1);
+  }
+
+  void doStabilityTest(int n, int numThreads, long expectedValues[], int maxAttempt) throws InterruptedException {
+    // This test aims to reproduce the following Spark query, which produces inconsistent results between runs
+    // spark.range(1000000000L).selectExpr("CAST(id as STRING) as str_id").filter("regexp_like(str_id, '(.|\n)*1(.|\n)0(.|\n)*')").count()
+
+    // no need to create initial input in parallel
+    ColumnVector inputs[] = new ColumnVector[numThreads];
+    int chunk_size = n/numThreads;
+    for (int j = 0; j<numThreads; j++) {
+      long array[] = new long[chunk_size];
+      for (int i = 0; i < chunk_size; i++) {
+        array[i] = chunk_size * j + i;
+      }
+      try (ColumnVector cv = ColumnVector.fromLongs(array)) {
+        inputs[j] = cv.castTo(DType.STRING);
+      }
+    }
+
+    for (int attempt = 0; attempt< maxAttempt; attempt++) {
+      System.err.println("attempt " + attempt + " of " + maxAttempt);
+
+      Thread threads[] = new Thread[numThreads];
+      long result[] = new long[numThreads];
+      for (int j = 0; j < numThreads; j++) {
+        int threadNo = j;
+        threads[j] = new Thread(() -> {
+          try (ColumnVector matchesRe = inputs[threadNo].matchesRe("(.|\\n)*1(.|\\n)0(.|\\n)*");
+               Table t = new Table(inputs[threadNo]);
+               Table t2 = t.filter(matchesRe)) {
+            result[threadNo] = t2.getRowCount();
+            System.err.println("thread " + threadNo + " count: " + t2.getRowCount());
+          }
+
+        });
+        System.err.println("starting thread");
+        threads[j].start();
+      }
+
+      for (Thread t : threads) {
+        System.err.println("waiting for thread");
+        t.join();
+        System.err.println("thread completed");
+      }
+
+      for (int j = 0; j < numThreads; j++) {
+        assertEquals(expectedValues[j], result[j]);
+      }
+    }
+  }
 
 }

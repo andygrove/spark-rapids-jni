@@ -42,14 +42,14 @@ public class CastStringsTest {
 //    }
 //  }
 
-  @Test
-  void castLongToStringScalarVersion() {
-    int n = 1_000_000_000;
-    try (ColumnVector cv = ColumnVector.fromScalar(Scalar.fromLong(Long.MAX_VALUE), n);
-         ColumnVector cv2 = cv.castTo(DType.STRING)) {
-      // success
-    }
-  }
+//  @Test
+//  void castLongToStringScalarVersion() {
+//    int n = 1_000_000_000;
+//    try (ColumnVector cv = ColumnVector.fromScalar(Scalar.fromLong(Long.MAX_VALUE), n);
+//         ColumnVector cv2 = cv.castTo(DType.STRING)) {
+//      // success
+//    }
+//  }
 
   @Test
   void castToIntegerTest() {
