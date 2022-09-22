@@ -59,63 +59,6 @@ public class CastStringsTest {
   }
 
   @Test
-  void castThenRegexStabilityRepro() throws InterruptedException {
-    // spark.range(1000000000L).selectExpr("CAST(id as STRING) as str_id").filter("regexp_like(str_id, '(.|\n)*1(.|\n)0(.|\n)*')").count()
-
-    int n = 1_000_000_000;
-    int numThreads = 2;
-    long expectedValues[] = new long [] { 0, 0 }; // expected values TBD
-
-    // no need to create initial input in parallel
-    ColumnVector inputs[] = new ColumnVector[numThreads];
-    for (int j = 0; j<numThreads; j++) {
-      long array[] = new long[n];
-      int chunk_size = n/numThreads;
-      for (int i = 0; i < n; i++) {
-        array[i] = chunk_size * j + i;
-      }
-      try (ColumnVector cv = ColumnVector.fromLongs(array)) {
-        inputs[j] = cv.castTo(DType.STRING);
-      }
-    }
-
-    int maxAttempt = 10;
-    for (int attempt = 0; attempt< maxAttempt; attempt++) {
-      System.out.println("attempt " + attempt + " of " + maxAttempt);
-
-      Thread threads[] = new Thread[numThreads];
-      long result[] = new long[numThreads];
-      for (int j = 0; j < numThreads; j++) {
-        int threadNo = j;
-        threads[j] = new Thread(() -> {
-          try (ColumnVector matchesRe = inputs[threadNo].matchesRe("(.|\\n)*1(.|\\n)0(.|\\n)*");
-               Table t = new Table(inputs[threadNo]);
-               Table t2 = t.filter(matchesRe)) {
-            result[threadNo] = t2.getRowCount();
-            System.out.println("thread " + threadNo + " count: " + t2.getRowCount());
-          }
-
-        });
-        System.out.println("starting thread");
-        threads[j].start();
-      }
-
-      for (Thread t : threads) {
-        System.out.println("waiting for thread");
-        t.join();
-        System.out.println("thread completed");
-      }
-
-      for (int j = 0; j < numThreads; j++) {
-        assertEquals(expectedValues[j], result[j]);
-      }
-
-      // pause between attempts
-      Thread.sleep(500);
-    }
-  }
-
-  @Test
   void castToIntegerAnsiTest() {
     Table.TestBuilder tb = new Table.TestBuilder();
     tb.column(3l, 9l, 4l, 2l, 20l);
