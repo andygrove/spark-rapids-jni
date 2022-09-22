@@ -25,28 +25,28 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class RegexTest {
 
-  @Test
-  void testCastIntToString() {
-    int n = 100_000_000;
-    long array[] = new long[n];
-    for (int i = 0; i < n; i++) {
-      array[i] = i;
-    }
-
-    for (int j=0; j<10; j++) {
-      try (ColumnVector cv = ColumnVector.fromLongs(array)) {
-        try (ColumnVector cv2 = cv.castTo(DType.STRING)) {
-          // success
-          System.out.println(cv2.getRowCount());
-        }
-      }
-    }
-  }
-
 //  @Test
-//  void regexStabilityTest1() throws InterruptedException {
-//    doStabilityTest(1_000_000_000, 2, new long [] { 0, 0 }, 1);
+//  void testCastIntToString() {
+//    int n = 100_000_000;
+//    long array[] = new long[n];
+//    for (int i = 0; i < n; i++) {
+//      array[i] = i;
+//    }
+//
+//    for (int j=0; j<10; j++) {
+//      try (ColumnVector cv = ColumnVector.fromLongs(array)) {
+//        try (ColumnVector cv2 = cv.castTo(DType.STRING)) {
+//          // success
+//          System.out.println(cv2.getRowCount());
+//        }
+//      }
+//    }
 //  }
+
+  @Test
+  void regexStabilityTest1() throws InterruptedException {
+    doStabilityTest(1_000_000_000, 2, new long [] { 0, 0 }, 1);
+  }
 //
 //  @Test
 //  void regexStabilityTest2() throws InterruptedException {
