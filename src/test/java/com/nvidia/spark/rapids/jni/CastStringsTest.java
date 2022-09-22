@@ -16,10 +16,7 @@
 
 package com.nvidia.spark.rapids.jni;
 
-import ai.rapids.cudf.AssertUtils;
-import ai.rapids.cudf.ColumnVector;
-import ai.rapids.cudf.DType;
-import ai.rapids.cudf.Table;
+import ai.rapids.cudf.*;
 import com.nvidia.spark.rapids.jni.CastException;
 import org.junit.jupiter.api.Test;
 
@@ -35,15 +32,15 @@ public class CastStringsTest {
   @Test
   void castLongToString() {
     int n = 1_000_000_000;
-    long array[] = new long[n];
-    for (int i = 0; i < n; i++) {
-      array[i] = i;
-    }
-    try (ColumnVector cv = ColumnVector.fromLongs(array);
-      ColumnVector cv2 = cv.castTo(DType.STRING)) {
+//    long array[] = new long[n];
+//    for (int i = 0; i < n; i++) {
+//      array[i] = i;
+//    }
+    try (ColumnVector cv = ColumnVector.fromScalar(Scalar.fromLong(Long.MAX_VALUE), n);
+        ColumnVector cv2 = cv.castTo(DType.STRING)) {
       // success
     }
-}
+  }
 
   @Test
   void castToIntegerTest() {
