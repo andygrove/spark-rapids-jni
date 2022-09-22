@@ -59,14 +59,12 @@ public class CastStringsTest {
   }
 
   @Test
-  void repro() throws InterruptedException {
+  void castThenRegexStabilityRepro() throws InterruptedException {
     // spark.range(1000000000L).selectExpr("CAST(id as STRING) as str_id").filter("regexp_like(str_id, '(.|\n)*1(.|\n)0(.|\n)*')").count()
 
-//    int n = 1_000_000_000;
-
-    int n = 50_000_000;
+    int n = 1_000_000_000;
     int numThreads = 2;
-    long expectedValues[] = new long [] { 3425499 , 2465100 };
+    long expectedValues[] = new long [] { 0, 0 }; // expected values TBD
 
     // no need to create initial input in parallel
     ColumnVector inputs[] = new ColumnVector[numThreads];
