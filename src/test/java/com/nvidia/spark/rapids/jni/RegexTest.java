@@ -27,15 +27,17 @@ public class RegexTest {
 
   @Test
   void testCastIntToString() {
-    for (int j=0; j<2; j++) {
-      int n = 100_000_000;
-      long array[] = new long[n];
-      for (int i = 0; i < n; i++) {
-        array[i] = i;
-      }
+    int n = 100_000_000;
+    long array[] = new long[n];
+    for (int i = 0; i < n; i++) {
+      array[i] = i;
+    }
+
+    for (int j=0; j<10; j++) {
       try (ColumnVector cv = ColumnVector.fromLongs(array)) {
         try (ColumnVector cv2 = cv.castTo(DType.STRING)) {
           // success
+          System.out.println(cv2.getRowCount());
         }
       }
     }
