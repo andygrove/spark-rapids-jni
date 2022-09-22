@@ -25,33 +25,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class RegexTest {
 
-//  @Test
-//  void testCastIntToString() {
-//    int n = 100_000_000;
-//    long array[] = new long[n];
-//    for (int i = 0; i < n; i++) {
-//      array[i] = i;
-//    }
-//
-//    for (int j=0; j<10; j++) {
-//      try (ColumnVector cv = ColumnVector.fromLongs(array)) {
-//        try (ColumnVector cv2 = cv.castTo(DType.STRING)) {
-//          // success
-//          System.out.println(cv2.getRowCount());
-//        }
-//      }
-//    }
-//  }
 
   @Test
   void regexStabilityTest1() throws InterruptedException {
     doStabilityTest(1_000_000_000, 2, new long [] { 0, 0 }, 1);
   }
-//
-//  @Test
-//  void regexStabilityTest2() throws InterruptedException {
-//    doStabilityTest(50_000_000, 2, new long [] { 0, 0 }, 1);
-//  }
 
   void doStabilityTest(int n, int numThreads, long expectedValues[], int maxAttempt) throws InterruptedException {
     // This test aims to reproduce the following Spark query, which produces inconsistent results between runs
@@ -59,10 +37,10 @@ public class RegexTest {
 
     // no need to create initial input in parallel
     ColumnVector inputs[] = new ColumnVector[numThreads];
+    int chunk_size = n/numThreads;
     for (int j = 0; j<numThreads; j++) {
-      long array[] = new long[n];
-      int chunk_size = n/numThreads;
-      for (int i = 0; i < n; i++) {
+      long array[] = new long[chunk_size];
+      for (int i = 0; i < chunk_size; i++) {
         array[i] = chunk_size * j + i;
       }
       try (ColumnVector cv = ColumnVector.fromLongs(array)) {
