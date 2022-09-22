@@ -27,7 +27,10 @@ public class RegexTest {
 
   @Test
   void regexStabilityTest1() throws InterruptedException {
-    doStabilityTest(500_000_000, 2, new long [] { 0, 0 }, 1);
+    //doStabilityTest(100_000_000, 2, new long [] { 3425499, 2465100 }, 100);
+    //doStabilityTest(200_000_000, 2, new long [] { 5890599, 15397579 }, 100);
+    //doStabilityTest(400_000_000, 2, new long [] { 21288178, 11781198 }, 100);
+    doStabilityTest(450_000_000, 2, new long [] { 23529637, 12965238 }, 100);
   }
 
   void doStabilityTest(int n, int numThreads, long expectedValues[], int maxAttempt) throws InterruptedException {
@@ -42,9 +45,7 @@ public class RegexTest {
       for (int i = 0; i < chunk_size; i++) {
         array[i] = chunk_size * j + i;
       }
-      try (ColumnVector cv = ColumnVector.fromLongs(array)) {
-        inputs[j] = cv.castTo(DType.STRING);
-      }
+      inputs[j] = ColumnVector.fromLongs(array);
     }
 
     for (int attempt = 0; attempt< maxAttempt; attempt++) {
@@ -55,7 +56,8 @@ public class RegexTest {
       for (int j = 0; j < numThreads; j++) {
         int threadNo = j;
         threads[j] = new Thread(() -> {
-          try (ColumnVector matchesRe = inputs[threadNo].matchesRe("(.|\\n)*1(.|\\n)0(.|\\n)*");
+          try (ColumnVector castTo = inputs[threadNo].castTo(DType.STRING);
+               ColumnVector matchesRe = castTo.matchesRe("(.|\\n)*1(.|\\n)0(.|\\n)*");
                Table t = new Table(inputs[threadNo]);
                Table t2 = t.filter(matchesRe)) {
             result[threadNo] = t2.getRowCount();
