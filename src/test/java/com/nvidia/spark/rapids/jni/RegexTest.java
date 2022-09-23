@@ -27,13 +27,10 @@ public class RegexTest {
 
   @Test
   void regexStabilityTest1() throws InterruptedException {
-    //doStabilityTest(100_000_000, 2, new long [] { 3425499, 2465100 }, 100);
-    //doStabilityTest(200_000_000, 2, new long [] { 5890599, 15397579 }, 100);
-    //doStabilityTest(400_000_000, 2, new long [] { 21288178, 11781198 }, 100);
-    doStabilityTest(450_000_000, 2, new long [] { 23529637, 12965238 }, 100);
+    doStabilityTest(450_000_000, 2, 100);
   }
 
-  void doStabilityTest(int n, int numThreads, long expectedValues[], int maxAttempt) throws InterruptedException {
+  void doStabilityTest(int n, int numThreads, int maxAttempt) throws InterruptedException {
     // This test aims to reproduce the following Spark query, which produces inconsistent results between runs
     // spark.range(1000000000L).selectExpr("CAST(id as STRING) as str_id").filter("regexp_like(str_id, '(.|\n)*1(.|\n)0(.|\n)*')").count()
 
@@ -75,8 +72,9 @@ public class RegexTest {
         System.err.println("thread completed");
       }
 
-      for (int j = 0; j < numThreads; j++) {
-        assertEquals(expectedValues[j], result[j]);
+      // check that the results from each thread are the same
+      for (int j = 1; j < numThreads; j++) {
+        assertEquals(result[0], result[j]);
       }
     }
   }
