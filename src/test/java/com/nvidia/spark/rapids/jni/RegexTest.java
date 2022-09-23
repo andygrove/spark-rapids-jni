@@ -21,6 +21,9 @@ import ai.rapids.cudf.DType;
 import ai.rapids.cudf.Table;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class RegexTest {
@@ -44,6 +47,8 @@ public class RegexTest {
       }
       inputs[j] = ColumnVector.fromLongs(array);
     }
+
+    String csvResults[] = new String[maxAttempt];
 
     for (int attempt = 0; attempt< maxAttempt; attempt++) {
       System.err.println("attempt " + attempt + " of " + maxAttempt);
@@ -72,11 +77,16 @@ public class RegexTest {
         System.err.println("thread completed");
       }
 
-      // check that the results from each thread are the same
-      for (int j = 1; j < numThreads; j++) {
-        assertEquals(result[0], result[j]);
-      }
+      csvResults[attempt] = Arrays.stream(result)
+              .mapToObj(String::valueOf)
+              .collect(Collectors.joining(","));
     }
+
+    // check that the results from each run are the same
+    for (int attempt = 0; attempt< maxAttempt; attempt++) {
+      assertEquals(csvResults[0], csvResults[attempt]);
+    }
+
   }
 
 }
