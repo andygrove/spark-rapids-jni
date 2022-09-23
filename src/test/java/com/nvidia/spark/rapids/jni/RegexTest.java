@@ -80,6 +80,8 @@ public class RegexTest {
       csvResults[attempt] = Arrays.stream(result)
               .mapToObj(String::valueOf)
               .collect(Collectors.joining(","));
+
+      System.err.println("Results: " + csvResults[attempt]);
     }
 
     // check that the results from each run are the same
