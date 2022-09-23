@@ -30,7 +30,7 @@ public class RegexTest {
 
   @Test
   void regexStabilityTest1() throws InterruptedException {
-    doStabilityTest(450_000_000, 2, 100);
+    doStabilityTest(450_000_000, 4, 10);
   }
 
   void doStabilityTest(int n, int numThreads, int maxAttempt) throws InterruptedException {
